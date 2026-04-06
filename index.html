@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="持ち物チェック">
+<title>保育園 持ち物チェックリスト（2歳クラス）</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+    background: #f0f4f8;
+    color: #333;
+    padding: 0 0 100px 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    padding: 20px 16px 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  header .subtitle {
+    font-size: 12px;
+    opacity: 0.9;
+  }
+  .tab-bar {
+    display: flex;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 76px;
+    z-index: 99;
+  }
+  .tab {
+    flex: 1;
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    color: #888;
+  }
+  .tab.active {
+    color: #4facfe;
+    border-bottom-color: #4facfe;
+  }
+  .tab .tab-icon { font-size: 20px; display: block; margin-bottom: 2px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .progress-bar {
+    background: white;
+    padding: 12px 16px;
+    margin: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .progress-bar .label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .progress-track {
+    height: 8px;
+    background: #e8edf2;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .progress-fill.complete {
+    background: linear-gradient(90deg, #43e97b, #38f9d7);
+  }
+
+  .section {
+    margin: 12px 16px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    padding-left: 4px;
+  }
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .item {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.15s;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .item:last-child { border-bottom: none; }
+  .item:active { background: #f8f9fa; }
+  .item.checked { opacity: 0.5; }
+  .item.checked .item-name { text-decoration: line-through; }
+
+  .checkbox {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2.5px solid #ccc;
+    flex-shrink: 0;
+    margin-right: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .item.checked .checkbox {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    border-color: #4facfe;
+  }
+  .checkbox svg {
+    width: 16px;
+    height: 16px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .item.checked .checkbox svg { opacity: 1; }
+
+  .item-icon {
+    font-size: 28px;
+    margin-right: 12px;
+    flex-shrink: 0;
+    width: 36px;
+    text-align: center;
+  }
+  .item-info { flex: 1; min-width: 0; }
+  .item-name {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    transition: all 0.2s;
+  }
+  .item-detail {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .item-note {
+    display: inline-block;
+    font-size: 10px;
+    background: #fff3cd;
+    color: #856404;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-top: 4px;
+  }
+  .item-in-bag {
+    display: inline-block;
+    font-size: 10px;
+    background: #e8f4fd;
+    color: #0c5460;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-top: 4px;
+  }
+
+  .reset-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(238,90,36,0.35);
+    z-index: 100;
+    transition: transform 0.15s;
+  }
+  .reset-btn:active { transform: translateX(-50%) scale(0.95); }
+
+  .complete-msg {
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #43e97b;
+    display: none;
+  }
+  .complete-msg.show { display: block; }
+
+  .info-box {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 12px 16px;
+    margin: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #664d03;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a2e; color: #e0e0e0; }
+    header { background: linear-gradient(135deg, #0f3460, #16213e); }
+    .tab-bar { background: #16213e; border-color: #0f3460; }
+    .tab { color: #666; }
+    .tab.active { color: #4facfe; }
+    .card, .progress-bar { background: #16213e; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+    .item { border-color: #0f3460; }
+    .item:active { background: #1a1a3e; }
+    .item-detail { color: #888; }
+    .info-box { background: #332b00; border-color: #665500; color: #ffc107; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>保育園 持ち物チェック</h1>
+  <div class="subtitle">2歳クラス（すみれ）</div>
+</header>
+
+<div class="tab-bar">
+  <div class="tab active" data-tab="daily">
+    <span class="tab-icon">&#x1F31E;</span>毎日
+  </div>
+  <div class="tab" data-tab="monday">
+    <span class="tab-icon">&#x1F4C5;</span>月曜
+  </div>
+</div>
+
+<!-- 毎日の持ち物 -->
+<div class="tab-content active" id="tab-daily">
+
+  <div class="progress-bar">
+    <div class="label">
+      <span>準備の進み具合</span>
+      <span id="daily-count">0 / 0</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="daily-progress" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="complete-msg" id="daily-complete">準備OK！いってらっしゃい！</div>
+
+  <div class="section">
+    <div class="section-title">リュックの中身</div>
+    <div class="card">
+      <div class="item" data-id="d-renrakucho">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F4D2;</div>
+        <div class="item-info">
+          <div class="item-name">連絡帳袋</div>
+          <div class="item-detail">連絡帳・体温記録表・提出物を入れる</div>
+          <span class="item-in-bag">リュックに入れる</span>
+        </div>
+      </div>
+      <div class="item" data-id="d-towel">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F9F4;</div>
+        <div class="item-info">
+          <div class="item-name">手拭きタオル</div>
+          <div class="item-detail">30×30cm ループ付き</div>
+          <span class="item-in-bag">リュックに入れる</span>
+        </div>
+      </div>
+      <div class="item" data-id="d-cup">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F964;</div>
+        <div class="item-info">
+          <div class="item-name">コップ＋巾着袋</div>
+          <div class="item-detail">取っ手付きコップを巾着袋に入れる</div>
+          <span class="item-in-bag">リュックに入れる</span>
+        </div>
+      </div>
+      <div class="item" data-id="d-kuchifuki">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F9FB;</div>
+        <div class="item-info">
+          <div class="item-name">給食用口拭きタオル</div>
+          <div class="item-detail">20×20cm 1枚</div>
+          <span class="item-in-bag">リュックに入れる</span>
+        </div>
+      </div>
+      <div class="item" data-id="d-apron-bag">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F4E6;</div>
+        <div class="item-info">
+          <div class="item-name">エプロン袋</div>
+          <div class="item-detail">ビニール製（約17×22cm）ジップロック不可</div>
+          <span class="item-in-bag">リュックに入れる</span>
+        </div>
+      </div>
+      <div class="item" data-id="d-apron">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F372;</div>
+        <div class="item-info">
+          <div class="item-name">給食用エプロン</div>
+          <div class="item-detail">手づくり・布の柄なし・ひざ上丈</div>
+          <span class="item-note">首回り・胸元にゴムを付ける</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">手提げ袋の中身</div>
+    <div class="card">
+      <div class="item" data-id="d-clothes">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F455;</div>
+        <div class="item-info">
+          <div class="item-name">補充用衣類</div>
+          <div class="item-detail">着替え上下・下着・靴下など</div>
+          <span class="item-in-bag">手提げ袋に入れる</span>
+        </div>
+      </div>
+      <div class="item" data-id="d-diaper">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F476;</div>
+        <div class="item-info">
+          <div class="item-name">オムツ</div>
+          <div class="item-detail">記名済みのもの</div>
+          <span class="item-in-bag">手提げ袋に入れる</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">そのまま持つもの</div>
+    <div class="card">
+      <div class="item" data-id="d-bag-tote">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F45C;</div>
+        <div class="item-info">
+          <div class="item-name">手提げ袋（布製）</div>
+          <div class="item-detail">縦35〜38cm × 横35〜40cm</div>
+        </div>
+      </div>
+      <div class="item" data-id="d-pillow-towel">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F6CF;&#xFE0F;</div>
+        <div class="item-info">
+          <div class="item-name">午睡用枕タオル</div>
+          <div class="item-detail">フェイスタオル 35×85cm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box">
+    ※ 水筒・スモックは3歳〜のため不要<br>
+    ※ 全ての持ち物に大きくはっきり記名すること
+  </div>
+</div>
+
+<!-- 月曜の持ち物 -->
+<div class="tab-content" id="tab-monday">
+
+  <div class="progress-bar">
+    <div class="label">
+      <span>準備の進み具合</span>
+      <span id="monday-count">0 / 0</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="monday-progress" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="complete-msg" id="monday-complete">月曜の準備OK！</div>
+
+  <div class="section">
+    <div class="section-title">お昼寝セット</div>
+    <div class="card">
+      <div class="item" data-id="m-mat">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F9F9;</div>
+        <div class="item-info">
+          <div class="item-name">午睡用敷マット</div>
+          <div class="item-detail">園指定 70×124cm</div>
+        </div>
+      </div>
+      <div class="item" data-id="m-sheet">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F6CF;&#xFE0F;</div>
+        <div class="item-info">
+          <div class="item-name">シーツ</div>
+          <div class="item-detail">園指定サイズ・ファスナー式</div>
+          <span class="item-note">表面右上に記名布をつける</span>
+        </div>
+      </div>
+      <div class="item" data-id="m-blanket">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1FA6B;</div>
+        <div class="item-info">
+          <div class="item-name">午睡用掛けもの</div>
+          <div class="item-detail">敷布・フリース・タオルケット等（季節に合わせる）</div>
+          <span class="item-note">10×30cmの記名布を付ける</span>
+        </div>
+      </div>
+      <div class="item" data-id="m-futon-bag">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F4BC;</div>
+        <div class="item-info">
+          <div class="item-name">布団袋</div>
+          <div class="item-detail">敷マット＋掛けものが入る大きめの袋</div>
+          <span class="item-note">エコバッグ等でも可</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">布団の上に掛けるもの</div>
+    <div class="card">
+      <div class="item" data-id="m-布団掛けもの">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F319;</div>
+        <div class="item-info">
+          <div class="item-name">午睡用の服（パジャマ）</div>
+          <div class="item-detail">やわらかい素材・着脱しやすいもの</div>
+          <span class="item-note">Tシャツではなく前開きの服</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">園で使うもの</div>
+    <div class="card">
+      <div class="item" data-id="m-hat">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F9E2;</div>
+        <div class="item-info">
+          <div class="item-name">散歩用帽子</div>
+          <div class="item-detail">園指定・内側にお印と名前を記入</div>
+          <span class="item-note">ゴムのループ付き</span>
+        </div>
+      </div>
+      <div class="item" data-id="m-shoes">
+        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-icon">&#x1F45F;</div>
+        <div class="item-info">
+          <div class="item-name">上履き</div>
+          <div class="item-detail">2歳〜・左右わかるように記名</div>
+          <span class="item-note">一本の紐でゴムのループを付ける</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box">
+    ※ 月曜持参 → 金曜持ち帰り（週1回の入替え）<br>
+    ※ 布団は毎週金曜に持ち帰り洗濯<br>
+    ※ スモックは3歳〜のため不要
+  </div>
+</div>
+
+<button class="reset-btn" id="resetBtn">リセット</button>
+
+<script>
+(function() {
+  const STORAGE_KEY = 'hoikuen-checklist-v1';
+
+  function loadState() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    } catch { return {}; }
+  }
+
+  function saveState(state) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  // Auto-reset at 5am each day for daily items
+  function checkAutoReset() {
+    const now = new Date();
+    const lastReset = localStorage.getItem('hoikuen-last-reset');
+    const today = now.toISOString().slice(0, 10);
+    if (lastReset !== today && now.getHours() >= 5) {
+      const state = loadState();
+      // Reset only daily items
+      Object.keys(state).forEach(k => {
+        if (k.startsWith('d-')) delete state[k];
+      });
+      // Reset monday items on Monday
+      if (now.getDay() === 1) {
+        Object.keys(state).forEach(k => {
+          if (k.startsWith('m-')) delete state[k];
+        });
+      }
+      saveState(state);
+      localStorage.setItem('hoikuen-last-reset', today);
+    }
+  }
+
+  checkAutoReset();
+
+  const state = loadState();
+  const items = document.querySelectorAll('.item[data-id]');
+
+  items.forEach(item => {
+    const id = item.dataset.id;
+    if (state[id]) item.classList.add('checked');
+
+    item.addEventListener('click', () => {
+      item.classList.toggle('checked');
+      const checked = item.classList.contains('checked');
+      if (checked) {
+        state[id] = true;
+        // Haptic feedback
+        if (navigator.vibrate) navigator.vibrate(10);
+      } else {
+        delete state[id];
+      }
+      saveState(state);
+      updateProgress();
+    });
+  });
+
+  // Tabs
+  const tabs = document.querySelectorAll('.tab');
+  const contents = document.querySelectorAll('.tab-content');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Auto-select Monday tab on Monday
+  if (new Date().getDay() === 1) {
+    // Show Monday tab first on Mondays
+  }
+
+  // Progress
+  function updateProgress() {
+    ['daily', 'monday'].forEach(type => {
+      const prefix = type === 'daily' ? 'd-' : 'm-';
+      const allItems = document.querySelectorAll(`#tab-${type} .item[data-id]`);
+      const total = allItems.length;
+      let checked = 0;
+      allItems.forEach(i => { if (i.classList.contains('checked')) checked++; });
+      const pct = total > 0 ? (checked / total * 100) : 0;
+
+      const bar = document.getElementById(type + '-progress');
+      bar.style.width = pct + '%';
+      bar.classList.toggle('complete', pct === 100);
+
+      document.getElementById(type + '-count').textContent = checked + ' / ' + total;
+
+      const msg = document.getElementById(type + '-complete');
+      msg.classList.toggle('show', pct === 100);
+    });
+  }
+  updateProgress();
+
+  // Reset
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (!confirm('チェックをリセットしますか？')) return;
+    const activeTab = document.querySelector('.tab.active').dataset.tab;
+    const prefix = activeTab === 'daily' ? 'd-' : 'm-';
+    const currentState = loadState();
+    Object.keys(currentState).forEach(k => {
+      if (k.startsWith(prefix)) delete currentState[k];
+    });
+    saveState(currentState);
+    document.querySelectorAll(`#tab-${activeTab} .item`).forEach(i => i.classList.remove('checked'));
+    updateProgress();
+  });
+})();
+</script>
+
+</body>
+</html>
