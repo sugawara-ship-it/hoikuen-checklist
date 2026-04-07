@@ -5,339 +5,354 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="持ち物チェック">
-<title>保育園 持ち物チェックリスト（2歳 ひつじクラス）</title>
+<meta name="apple-mobile-web-app-title" content="持ち物">
+<title>保育園 持ち物チェック（2歳 ひつじ）</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
-    background: #f0f4f8;
-    color: #333;
-    padding: 0 0 100px 0;
-    -webkit-tap-highlight-color: transparent;
-  }
-  header {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-    padding: 20px 16px 16px;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-  header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  header .subtitle { font-size: 12px; opacity: 0.9; }
-  .tab-bar {
-    display: flex;
-    background: white;
-    border-bottom: 1px solid #e0e0e0;
-    position: sticky;
-    top: 76px;
-    z-index: 99;
-  }
-  .tab {
-    flex: 1;
-    padding: 12px 8px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s;
-    color: #888;
-  }
-  .tab.active { color: #4facfe; border-bottom-color: #4facfe; }
-  .tab .tab-icon { font-size: 20px; display: block; margin-bottom: 2px; }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;
+  background:#f5f7fa;color:#333;
+  padding-bottom:90px;
+  -webkit-tap-highlight-color:transparent;
+}
+header{
+  background:linear-gradient(135deg,#4facfe,#00f2fe);
+  color:#fff;padding:18px 16px 14px;text-align:center;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
+}
+header h1{font-size:17px;font-weight:700}
+header .sub{font-size:11px;opacity:.85;margin-top:2px}
 
-  .progress-bar {
-    background: white;
-    padding: 12px 16px;
-    margin: 12px 16px;
-    border-radius: 12px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-  }
-  .progress-bar .label {
-    font-size: 13px; font-weight: 600; color: #666;
-    margin-bottom: 8px; display: flex; justify-content: space-between;
-  }
-  .progress-track { height: 8px; background: #e8edf2; border-radius: 4px; overflow: hidden; }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4facfe, #00f2fe);
-    border-radius: 4px;
-    transition: width 0.4s ease;
-  }
-  .progress-fill.complete { background: linear-gradient(90deg, #43e97b, #38f9d7); }
+/* remaining counter */
+.remaining{
+  text-align:center;padding:16px 16px 4px;
+  font-size:28px;font-weight:800;color:#4facfe;
+}
+.remaining .label{font-size:13px;font-weight:600;color:#888;display:block;margin-top:2px}
+.remaining.done{color:#2ecc71}
 
-  .section { margin: 12px 16px; }
-  .section-title {
-    font-size: 13px; font-weight: 700; color: #999;
-    letter-spacing: 1px; margin-bottom: 8px; padding-left: 4px;
-  }
-  .card {
-    background: white; border-radius: 12px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden;
-  }
-  .item {
-    display: flex; align-items: center;
-    padding: 14px 16px; border-bottom: 1px solid #f0f0f0;
-    transition: background 0.15s; cursor: pointer;
-    -webkit-user-select: none; user-select: none;
-  }
-  .item:last-child { border-bottom: none; }
-  .item:active { background: #f8f9fa; }
-  .item.checked { opacity: 0.5; }
-  .item.checked .item-name { text-decoration: line-through; }
-  .checkbox {
-    width: 28px; height: 28px; border-radius: 50%;
-    border: 2.5px solid #ccc; flex-shrink: 0; margin-right: 14px;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
-  }
-  .item.checked .checkbox {
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-    border-color: #4facfe;
-  }
-  .checkbox svg { width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s; }
-  .item.checked .checkbox svg { opacity: 1; }
-  .item-icon { font-size: 28px; margin-right: 12px; flex-shrink: 0; width: 36px; text-align: center; }
-  .item-info { flex: 1; min-width: 0; }
-  .item-name { font-size: 15px; font-weight: 600; line-height: 1.3; transition: all 0.2s; }
-  .item-detail { font-size: 12px; color: #888; margin-top: 2px; line-height: 1.4; }
-  .item-note {
-    display: inline-block; font-size: 10px;
-    background: #fff3cd; color: #856404;
-    padding: 2px 6px; border-radius: 4px; margin-top: 4px;
-  }
-  .item-in-bag {
-    display: inline-block; font-size: 10px;
-    background: #e8f4fd; color: #0c5460;
-    padding: 2px 6px; border-radius: 4px; margin-top: 4px;
-  }
-  .reset-btn {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-    color: white; border: none; padding: 14px 32px; border-radius: 50px;
-    font-size: 15px; font-weight: 700; cursor: pointer;
-    box-shadow: 0 4px 15px rgba(238,90,36,0.35); z-index: 100;
-    transition: transform 0.15s;
-  }
-  .reset-btn:active { transform: translateX(-50%) scale(0.95); }
-  .complete-msg {
-    text-align: center; padding: 20px; font-size: 16px;
-    font-weight: 700; color: #43e97b; display: none;
-  }
-  .complete-msg.show { display: block; }
-  .info-box {
-    background: #fff3cd; border-left: 4px solid #ffc107;
-    padding: 12px 16px; margin: 12px 16px;
-    border-radius: 0 8px 8px 0; font-size: 13px;
-    line-height: 1.6; color: #664d03;
-  }
-  .info-box-blue {
-    background: #e8f4fd; border-left: 4px solid #4facfe;
-    padding: 12px 16px; margin: 12px 16px;
-    border-radius: 0 8px 8px 0; font-size: 13px;
-    line-height: 1.6; color: #0c5460;
-  }
-  @media (prefers-color-scheme: dark) {
-    body { background: #1a1a2e; color: #e0e0e0; }
-    header { background: linear-gradient(135deg, #0f3460, #16213e); }
-    .tab-bar { background: #16213e; border-color: #0f3460; }
-    .tab { color: #666; }
-    .tab.active { color: #4facfe; }
-    .card, .progress-bar { background: #16213e; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
-    .item { border-color: #0f3460; }
-    .item:active { background: #1a1a3e; }
-    .item-detail { color: #888; }
-    .info-box { background: #332b00; border-color: #665500; color: #ffc107; }
-    .info-box-blue { background: #0a2a3a; border-color: #4facfe; color: #b0d4f1; }
-  }
+/* tabs */
+.tab-bar{
+  display:flex;background:#fff;border-bottom:1px solid #e0e0e0;
+  position:sticky;top:64px;z-index:99;
+}
+.tab{
+  flex:1;padding:10px 4px;text-align:center;font-size:13px;font-weight:600;
+  cursor:pointer;border-bottom:3px solid transparent;color:#aaa;transition:.2s;
+}
+.tab.active{color:#4facfe;border-bottom-color:#4facfe}
+.tab .ti{font-size:18px;display:block;margin-bottom:1px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* group */
+.group{margin:14px 12px}
+.group-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 4px;cursor:pointer;
+}
+.group-title{font-size:14px;font-weight:700;color:#555}
+.group-badge{
+  font-size:11px;font-weight:700;color:#fff;
+  background:#4facfe;border-radius:10px;padding:2px 8px;
+  min-width:20px;text-align:center;
+}
+.group-badge.done{background:#2ecc71}
+.group-check-all{
+  font-size:11px;color:#4facfe;font-weight:600;
+  border:1.5px solid #4facfe;border-radius:6px;
+  padding:4px 10px;cursor:pointer;background:transparent;
+  transition:.2s;margin-left:8px;
+}
+.group-check-all:active{background:#4facfe;color:#fff}
+
+/* items */
+.items{overflow:hidden}
+.item{
+  display:flex;align-items:center;
+  background:#fff;margin:0 0 2px;padding:16px 14px;
+  border-radius:10px;cursor:pointer;
+  transition:background .2s,opacity .3s,transform .3s;
+  user-select:none;-webkit-user-select:none;
+  min-height:62px;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
+}
+.item:active{background:#f0f8ff}
+.item.checked{
+  background:#f0faf0;opacity:.5;
+  order:1;
+}
+.item.checked .name{text-decoration:line-through;color:#999}
+
+.item .icon{font-size:30px;width:42px;flex-shrink:0;text-align:center}
+.item .info{flex:1;min-width:0;margin:0 10px}
+.item .name{font-size:16px;font-weight:600;line-height:1.3}
+.item .num{
+  display:inline-block;font-size:11px;font-weight:700;
+  color:#fff;background:#bbb;border-radius:4px;
+  width:20px;height:20px;line-height:20px;text-align:center;
+  margin-right:6px;vertical-align:middle;
+}
+.item.checked .num{background:#2ecc71}
+.item .detail{
+  font-size:11px;color:#999;line-height:1.4;margin-top:3px;
+  max-height:0;overflow:hidden;transition:max-height .3s;
+}
+.item .detail.open{max-height:120px}
+.item .note{
+  display:inline-block;font-size:10px;
+  background:#fff3cd;color:#856404;padding:1px 5px;
+  border-radius:3px;margin-top:3px;
+}
+.item .chevron{
+  color:#ccc;font-size:18px;flex-shrink:0;
+  transition:transform .2s;
+}
+.item .chevron.open{transform:rotate(90deg)}
+
+.check-circle{
+  width:30px;height:30px;border-radius:50%;
+  border:2.5px solid #ccc;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:.2s;
+}
+.item.checked .check-circle{background:linear-gradient(135deg,#2ecc71,#27ae60);border-color:#2ecc71}
+.check-circle svg{width:16px;height:16px;opacity:0;transition:.2s}
+.item.checked .check-circle svg{opacity:1}
+
+/* info box */
+.info-box{
+  background:#fff3cd;border-left:4px solid #ffc107;
+  padding:10px 14px;margin:12px 12px;border-radius:0 8px 8px 0;
+  font-size:12px;line-height:1.6;color:#664d03;
+}
+.info-box-blue{
+  background:#e8f4fd;border-left:4px solid #4facfe;
+  padding:10px 14px;margin:12px 12px;border-radius:0 8px 8px 0;
+  font-size:12px;line-height:1.6;color:#0c5460;
+}
+
+/* reset */
+.reset-btn{
+  position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+  background:#e74c3c;color:#fff;border:none;
+  padding:12px 28px;border-radius:40px;font-size:14px;font-weight:700;
+  cursor:pointer;box-shadow:0 3px 12px rgba(231,76,60,.35);z-index:100;
+}
+.reset-btn:active{transform:translateX(-50%) scale(.95)}
+
+/* complete celebration */
+.celebrate{
+  text-align:center;padding:12px;font-size:15px;font-weight:700;
+  color:#2ecc71;display:none;
+}
+.celebrate.show{display:block}
+
+@media(prefers-color-scheme:dark){
+  body{background:#1a1a2e;color:#e0e0e0}
+  header{background:linear-gradient(135deg,#0f3460,#16213e)}
+  .tab-bar{background:#16213e;border-color:#0f3460}
+  .tab{color:#555}
+  .item{background:#16213e;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .item:active{background:#1a1a3e}
+  .item.checked{background:#1a2e1a}
+  .item .name{color:#e0e0e0}
+  .item.checked .name{color:#666}
+  .group-title{color:#aaa}
+  .info-box{background:#332b00;border-color:#665500;color:#ffc107}
+  .info-box-blue{background:#0a2a3a;border-color:#4facfe;color:#b0d4f1}
+}
 </style>
 </head>
 <body>
 
 <header>
   <h1>保育園 持ち物チェック</h1>
-  <div class="subtitle">2歳クラス（ひつじ）</div>
+  <div class="sub">2歳 ひつじクラス</div>
 </header>
 
 <div class="tab-bar">
-  <div class="tab active" data-tab="daily">
-    <span class="tab-icon">&#x1F31E;</span>毎日
-  </div>
-  <div class="tab" data-tab="monday">
-    <span class="tab-icon">&#x1F4C5;</span>月曜
-  </div>
+  <div class="tab active" data-tab="daily"><span class="ti">&#x1F31E;</span>毎日</div>
+  <div class="tab" data-tab="monday"><span class="ti">&#x1F4C5;</span>月曜</div>
 </div>
 
-<!-- ========== 毎日の持ち物 ========== -->
+<!-- ===== 毎日 ===== -->
 <div class="tab-content active" id="tab-daily">
+  <div class="remaining" id="daily-remaining">あと <span id="daily-left">0</span> つ<span class="label">全部入れたらOK！</span></div>
+  <div class="celebrate" id="daily-celebrate">準備OK！いってらっしゃい！</div>
 
-  <div class="progress-bar">
-    <div class="label">
-      <span>準備の進み具合</span>
-      <span id="daily-count">0 / 0</span>
+  <!-- 食事セット -->
+  <div class="group" data-group="meal">
+    <div class="group-header">
+      <span class="group-title">🍚 食事セット</span>
+      <span><span class="group-badge" id="badge-meal">0/4</span><button class="group-check-all" data-target="meal">まとめてOK</button></span>
     </div>
-    <div class="progress-track">
-      <div class="progress-fill" id="daily-progress" style="width:0%"></div>
-    </div>
-  </div>
-  <div class="complete-msg" id="daily-complete">準備OK！いってらっしゃい！</div>
-
-  <!-- リュックの中身 -->
-  <div class="section">
-    <div class="section-title">リュックの中身</div>
-    <div class="card">
-      <div class="item" data-id="d-renrakucho">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F4D2;</div>
-        <div class="item-info">
-          <div class="item-name">1. 連絡帳袋</div>
-          <div class="item-detail">中に連絡帳・体温記録表・提出物を入れる</div>
-          <span class="item-note">ペン等は入れない</span>
+    <div class="items" id="items-meal">
+      <div class="item" data-id="d-apron-bag" data-g="meal">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">🛍️</div>
+        <div class="info">
+          <div class="name"><span class="num">1</span>エプロン袋</div>
+          <div class="detail">ビニール製ケース 約17×22cm（ジップロック不可・布の切替なし）<br><span class="note">中にエプロン＋口拭きタオルを入れる</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="d-towel">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F9E3;</div>
-        <div class="item-info">
-          <div class="item-name">2. 手拭きタオル</div>
-          <div class="item-detail">ハンドタオルの大きさ（30×30cm）・ループ付き</div>
+      <div class="item" data-id="d-apron" data-g="meal">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">🍽️</div>
+        <div class="info">
+          <div class="name"><span class="num">2</span>給食用エプロン</div>
+          <div class="detail">手づくり・布の柄なし・ひざ上丈・お印と名前を大きく<br><span class="note">首回り＆胸回りにゴム・胸元開きすぎ注意・自分で脱げるもの</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="d-cup">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x2615;</div>
-        <div class="item-info">
-          <div class="item-name">3. コップ＋コップ用巾着袋</div>
-          <div class="item-detail">取っ手付きコップ・底と手前面にも記名・巾着に入れる</div>
-          <span class="item-note">巾着は子どもが出し入れしやすい大きめのもの</span>
+      <div class="item" data-id="d-kuchifuki" data-g="meal">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">👄</div>
+        <div class="info">
+          <div class="name"><span class="num">3</span>給食用口拭きタオル</div>
+          <div class="detail">20×20cm 1枚 → エプロン袋に入れる<br><span class="note">黒ズミ・カビがあれば新品に交換</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="d-apron-bag">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F4E6;</div>
-        <div class="item-info">
-          <div class="item-name">4. エプロン袋（口拭きタオル入り）</div>
-          <div class="item-detail">ビニール製ケース 約17×22cm（ジップロック不可・布の切替なし）</div>
-          <span class="item-note">中にエプロン＋口拭きタオルを入れる</span>
+      <div class="item" data-id="d-cup" data-g="meal">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">🥤</div>
+        <div class="info">
+          <div class="name"><span class="num">4</span>コップ＋巾着袋</div>
+          <div class="detail">取っ手付きコップ・底と手前面にも記名・巾着に入れる<br><span class="note">巾着は子どもが出し入れしやすい大きめのもの</span></div>
         </div>
-      </div>
-      <div class="item" data-id="d-apron">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F9F1;</div>
-        <div class="item-info">
-          <div class="item-name">5. 給食用エプロン（手づくり）</div>
-          <div class="item-detail">布の柄なし・ひざ上丈・お印と名前を大きく付ける</div>
-          <span class="item-note">首回り＆胸回りにゴム・胸元開きすぎ注意・自分で脱げるもの</span>
-        </div>
-      </div>
-      <div class="item" data-id="d-kuchifuki">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F9F9;</div>
-        <div class="item-info">
-          <div class="item-name">6. 給食用口拭きタオル</div>
-          <div class="item-detail">20×20cm 1枚 → エプロン袋に入れる</div>
-          <span class="item-note">黒ズミ・カビがあれば新品に交換</span>
-        </div>
+        <div class="chevron">›</div>
       </div>
     </div>
   </div>
 
-  <div class="section">
-    <div class="section-title">手提げ袋の中身</div>
-    <div class="card">
-      <div class="item" data-id="d-diaper">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F9F7;</div>
-        <div class="item-info">
-          <div class="item-name">7. オムツ</div>
-          <div class="item-detail">記名済みのもの</div>
-          <span class="item-in-bag">手提げ袋に入れる</span>
+  <!-- リュック残り -->
+  <div class="group" data-group="bag">
+    <div class="group-header">
+      <span class="group-title">🎒 リュック＆手提げ</span>
+      <span><span class="group-badge" id="badge-bag">0/4</span><button class="group-check-all" data-target="bag">まとめてOK</button></span>
+    </div>
+    <div class="items" id="items-bag">
+      <div class="item" data-id="d-renrakucho" data-g="bag">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">📓</div>
+        <div class="info">
+          <div class="name"><span class="num">5</span>連絡帳袋</div>
+          <div class="detail">中に連絡帳・体温記録表・提出物を入れる<br><span class="note">ペン等は入れない</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="d-pillow-towel">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F6CF;&#xFE0F;</div>
-        <div class="item-info">
-          <div class="item-name">8. 午睡用枕タオル</div>
-          <div class="item-detail">フェイスタオル 35×85cm</div>
-          <span class="item-in-bag">手提げ袋に入れる</span>
+      <div class="item" data-id="d-towel" data-g="bag">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">👐</div>
+        <div class="info">
+          <div class="name"><span class="num">6</span>手拭きタオル</div>
+          <div class="detail">ハンドタオル（30×30cm）・ループ付き</div>
         </div>
+        <div class="chevron">›</div>
+      </div>
+      <div class="item" data-id="d-diaper" data-g="bag">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">👶</div>
+        <div class="info">
+          <div class="name"><span class="num">7</span>オムツ</div>
+          <div class="detail">記名済みのもの</div>
+        </div>
+        <div class="chevron">›</div>
+      </div>
+      <div class="item" data-id="d-pillow-towel" data-g="bag">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">😴</div>
+        <div class="info">
+          <div class="name"><span class="num">8</span>午睡用枕タオル</div>
+          <div class="detail">フェイスタオル 35×85cm</div>
+        </div>
+        <div class="chevron">›</div>
       </div>
     </div>
   </div>
 
-  <!-- 引き出しの衣類（持ち帰った翌日に補充） -->
-  <div class="section">
-    <div class="section-title">引き出しの衣類ストック（持ち帰った翌日に補充）</div>
-    <div class="card">
-      <div class="item" data-id="d-tshirt-short">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F455;</div>
-        <div class="item-info">
-          <div class="item-name">9. 半袖Tシャツ 2枚</div>
-          <div class="item-detail">柄に名前を書いても消えやすいので無地推奨</div>
+  <!-- 引き出し衣類 -->
+  <div class="group" data-group="clothes">
+    <div class="group-header">
+      <span class="group-title">👕 引き出しの衣類（翌日補充）</span>
+      <span><span class="group-badge" id="badge-clothes">0/6</span><button class="group-check-all" data-target="clothes">まとめてOK</button></span>
+    </div>
+    <div class="items" id="items-clothes">
+      <div class="item" data-id="d-tshirt-short" data-g="clothes">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">👕</div>
+        <div class="info">
+          <div class="name"><span class="num">9</span>半袖Tシャツ 2枚</div>
+          <div class="detail">柄に名前を書いても消えやすいので無地推奨</div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="d-tshirt-long">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F455;</div>
-        <div class="item-info">
-          <div class="item-name">10. 長袖Tシャツ 2枚</div>
-          <div class="item-detail">フードなし・ボタンなし・自分で着られるもの</div>
+      <div class="item" data-id="d-tshirt-long" data-g="clothes">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">👚</div>
+        <div class="info">
+          <div class="name"><span class="num">10</span>長袖Tシャツ 2枚</div>
+          <div class="detail">フードなし・ボタンなし・自分で着られるもの</div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="d-pants">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F456;</div>
-        <div class="item-info">
-          <div class="item-name">11. ズボン 2枚</div>
-          <div class="item-detail">伸縮性があり自分ではける物・スカート不可</div>
+      <div class="item" data-id="d-pants" data-g="clothes">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">👖</div>
+        <div class="info">
+          <div class="name"><span class="num">11</span>ズボン 2枚</div>
+          <div class="detail">伸縮性があり自分ではける物・スカート不可</div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="d-undershirt">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F3BD;</div>
-        <div class="item-info">
-          <div class="item-name">12. 肌着 2枚</div>
-          <div class="item-detail">季節に合わせたもの</div>
+      <div class="item" data-id="d-undershirt" data-g="clothes">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">🎽</div>
+        <div class="info">
+          <div class="name"><span class="num">12</span>肌着 2枚</div>
+          <div class="detail">季節に合わせたもの</div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="d-underwear">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1FA73;</div>
-        <div class="item-info">
-          <div class="item-name">13. パンツ 2枚</div>
-          <div class="item-detail">トイレトレーニングに備えて</div>
+      <div class="item" data-id="d-underwear" data-g="clothes">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">🩲</div>
+        <div class="info">
+          <div class="name"><span class="num">13</span>パンツ 2枚</div>
+          <div class="detail">トイレトレーニングに備えて</div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="d-socks">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F9E6;</div>
-        <div class="item-info">
-          <div class="item-name">14. 靴下</div>
-          <div class="item-detail">外遊びで汚した場合に使用（園内は裸足）</div>
+      <div class="item" data-id="d-socks" data-g="clothes">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">🧦</div>
+        <div class="info">
+          <div class="name"><span class="num">14</span>靴下</div>
+          <div class="detail">外遊びで汚した場合に使用（園内は裸足）</div>
         </div>
+        <div class="chevron">›</div>
       </div>
     </div>
   </div>
 
-  <!-- その他 -->
-  <div class="section">
-    <div class="section-title">その他</div>
-    <div class="card">
-      <div class="item" data-id="d-codmon">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F4F1;</div>
-        <div class="item-info">
-          <div class="item-name">15. コドモンの連絡帳ポスト</div>
-          <div class="item-detail">アプリから送信</div>
+  <!-- アプリ -->
+  <div class="group" data-group="app">
+    <div class="group-header">
+      <span class="group-title">📱 アプリ</span>
+      <span><span class="group-badge" id="badge-app">0/1</span></span>
+    </div>
+    <div class="items" id="items-app">
+      <div class="item" data-id="d-codmon" data-g="app">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">📱</div>
+        <div class="info">
+          <div class="name"><span class="num">15</span>コドモンの連絡帳ポスト</div>
+          <div class="detail">アプリから送信</div>
         </div>
+        <div class="chevron">›</div>
       </div>
     </div>
   </div>
@@ -350,114 +365,118 @@
   </div>
 </div>
 
-<!-- ========== 月曜の持ち物 ========== -->
+<!-- ===== 月曜 ===== -->
 <div class="tab-content" id="tab-monday">
+  <div class="remaining" id="monday-remaining">あと <span id="monday-left">0</span> つ<span class="label">全部入れたらOK！</span></div>
+  <div class="celebrate" id="monday-celebrate">月曜の準備OK！</div>
 
-  <div class="progress-bar">
-    <div class="label">
-      <span>準備の進み具合</span>
-      <span id="monday-count">0 / 0</span>
+  <!-- お昼寝セット -->
+  <div class="group" data-group="nap">
+    <div class="group-header">
+      <span class="group-title">🛏️ お昼寝セット</span>
+      <span><span class="group-badge" id="badge-nap">0/5</span><button class="group-check-all" data-target="nap">まとめてOK</button></span>
     </div>
-    <div class="progress-track">
-      <div class="progress-fill" id="monday-progress" style="width:0%"></div>
-    </div>
-  </div>
-  <div class="complete-msg" id="monday-complete">月曜の準備OK！</div>
-
-  <div class="section">
-    <div class="section-title">お昼寝セット</div>
-    <div class="card">
-      <div class="item" data-id="m-mat">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F6CF;&#xFE0F;</div>
-        <div class="item-info">
-          <div class="item-name">1. 午睡用敷マット</div>
-          <div class="item-detail">園指定またはサイズ 70×124cm</div>
+    <div class="items" id="items-nap">
+      <div class="item" data-id="m-mat" data-g="nap">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">🛏️</div>
+        <div class="info">
+          <div class="name"><span class="num">1</span>午睡用敷マット</div>
+          <div class="detail">園指定またはサイズ 70×124cm</div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="m-sheet">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F9F5;</div>
-        <div class="item-info">
-          <div class="item-name">2. シーツ</div>
-          <div class="item-detail">ファスナーで開閉する袋状・お子さまの大きさに合わせる</div>
-          <span class="item-note">表面右上に記名布を縫い付ける</span>
+      <div class="item" data-id="m-sheet" data-g="nap">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">⬜</div>
+        <div class="info">
+          <div class="name"><span class="num">2</span>シーツ</div>
+          <div class="detail">ファスナーで開閉する袋状・お子さまの大きさに合わせる<br><span class="note">表面右上に記名布を縫い付ける</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="m-blanket">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1FA6B;</div>
-        <div class="item-info">
-          <div class="item-name">3. 午睡用掛けもの</div>
-          <div class="item-detail">敷布・フリース・タオルケット等（季節ごとに調節）</div>
-          <span class="item-note">10×30cmの記名布を付ける</span>
+      <div class="item" data-id="m-blanket" data-g="nap">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">☁️</div>
+        <div class="info">
+          <div class="name"><span class="num">3</span>午睡用掛けもの</div>
+          <div class="detail">敷布・フリース・タオルケット等（季節ごとに調節）<br><span class="note">10×30cmの記名布を付ける</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="m-futon-bag">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F4BC;</div>
-        <div class="item-info">
-          <div class="item-name">4. 布団袋</div>
-          <div class="item-detail">敷マット＋掛けものが入る大きさ（エコバッグ等可）</div>
-          <span class="item-note">子どもが自分で出し入れできる大きさにする</span>
+      <div class="item" data-id="m-futon-bag" data-g="nap">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">🧳</div>
+        <div class="info">
+          <div class="name"><span class="num">4</span>布団袋</div>
+          <div class="detail">敷マット＋掛けものが入る大きさ（エコバッグ等可）<br><span class="note">子どもが自分で出し入れできる大きさにする</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="m-watersheet">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F4A7;</div>
-        <div class="item-info">
-          <div class="item-name">5. お水シーツ（必要な方のみ）</div>
-          <div class="item-detail">おねしょが心配な場合に用意</div>
-          <span class="item-in-bag">不要なら飛ばしてOK</span>
+      <div class="item" data-id="m-watersheet" data-g="nap">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">💧</div>
+        <div class="info">
+          <div class="name"><span class="num">5</span>お水シーツ（必要な方のみ）</div>
+          <div class="detail">おねしょが心配な場合に用意<br><span class="note">不要なら飛ばしてOK</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
     </div>
   </div>
 
-  <div class="section">
-    <div class="section-title">午睡用の服</div>
-    <div class="card">
-      <div class="item" data-id="m-pajama">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F319;</div>
-        <div class="item-info">
-          <div class="item-name">6. 午睡用の服</div>
-          <div class="item-detail">やわらかい素材・Tシャツではない半袖上下・着脱しやすいもの</div>
-          <span class="item-note">1週間使用（夏は洗濯を想定して持参）</span>
+  <!-- 午睡用の服 -->
+  <div class="group" data-group="pj">
+    <div class="group-header">
+      <span class="group-title">🌙 午睡用の服</span>
+      <span><span class="group-badge" id="badge-pj">0/2</span><button class="group-check-all" data-target="pj">まとめてOK</button></span>
+    </div>
+    <div class="items" id="items-pj">
+      <div class="item" data-id="m-pajama" data-g="pj">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">🌙</div>
+        <div class="info">
+          <div class="name"><span class="num">6</span>午睡用の服</div>
+          <div class="detail">やわらかい素材・Tシャツではない半袖上下・着脱しやすいもの<br><span class="note">1週間使用（夏は洗濯を想定して持参）</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="m-pajama-bag">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F45C;</div>
-        <div class="item-info">
-          <div class="item-name">7. 午睡用の服の袋</div>
-          <div class="item-detail">脱いだ服のかさを考慮した大きさ・名前を袋の外側に明記</div>
-          <span class="item-note">小さいものだと入れづらいので大きめを選ぶ</span>
+      <div class="item" data-id="m-pajama-bag" data-g="pj">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">👝</div>
+        <div class="info">
+          <div class="name"><span class="num">7</span>午睡用の服の袋</div>
+          <div class="detail">脱いだ服のかさを考慮した大きさ・名前を袋の外側に明記<br><span class="note">小さいものだと入れづらいので大きめを選ぶ</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
     </div>
   </div>
 
-  <div class="section">
-    <div class="section-title">園で使うもの</div>
-    <div class="card">
-      <div class="item" data-id="m-hat">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F9E2;</div>
-        <div class="item-info">
-          <div class="item-name">8. 園指定帽子</div>
-          <div class="item-detail">内側にお印と名前を記入・サンガードなし/あり選択</div>
-          <span class="item-note">2歳児はGW後に届く予定 - お知らせを待つ</span>
+  <!-- 園で使うもの -->
+  <div class="group" data-group="school">
+    <div class="group-header">
+      <span class="group-title">🏫 園で使うもの</span>
+      <span><span class="group-badge" id="badge-school">0/2</span><button class="group-check-all" data-target="school">まとめてOK</button></span>
+    </div>
+    <div class="items" id="items-school">
+      <div class="item" data-id="m-hat" data-g="school">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">🧢</div>
+        <div class="info">
+          <div class="name"><span class="num">8</span>園指定帽子</div>
+          <div class="detail">内側にお印と名前を記入・サンガードなし/あり選択<br><span class="note">2歳児はGW後に届く予定 - お知らせを待つ</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
-      <div class="item" data-id="m-shoes">
-        <div class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="item-icon">&#x1F45F;</div>
-        <div class="item-info">
-          <div class="item-name">9. 上履き</div>
-          <div class="item-detail">2歳〜・左右わかるように内側に記名</div>
-          <span class="item-note">かかとにゴムのループを付けると履きやすい</span>
+      <div class="item" data-id="m-shoes" data-g="school">
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="icon">👟</div>
+        <div class="info">
+          <div class="name"><span class="num">9</span>上履き</div>
+          <div class="detail">2歳〜・左右わかるように内側に記名<br><span class="note">かかとにゴムのループを付けると履きやすい</span></div>
         </div>
+        <div class="chevron">›</div>
       </div>
     </div>
   </div>
@@ -468,7 +487,6 @@
     ※ 布団袋は週の間は園でお預かり<br>
     ※ スモックは3歳児〜のため不要
   </div>
-
   <div class="info-box-blue">
     <strong>使用初日が土曜の場合</strong>：登園時にバスタオル2枚を持参。布団はその日のうちに持ち帰り。難しい場合は園にご相談ください。
   </div>
@@ -477,89 +495,142 @@
 <button class="reset-btn" id="resetBtn">リセット</button>
 
 <script>
-(function() {
-  const STORAGE_KEY = 'hoikuen-checklist-v2';
+(function(){
+  const KEY='hoikuen-v3';
+  const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch{return{}}};
+  const save=s=>localStorage.setItem(KEY,JSON.stringify(s));
 
-  function loadState() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
-    catch { return {}; }
-  }
-  function saveState(state) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }
-
-  function checkAutoReset() {
-    const now = new Date();
-    const lastReset = localStorage.getItem('hoikuen-last-reset-v2');
-    const today = now.toISOString().slice(0, 10);
-    if (lastReset !== today && now.getHours() >= 5) {
-      const state = loadState();
-      Object.keys(state).forEach(k => { if (k.startsWith('d-')) delete state[k]; });
-      if (now.getDay() === 1) {
-        Object.keys(state).forEach(k => { if (k.startsWith('m-')) delete state[k]; });
-      }
-      saveState(state);
-      localStorage.setItem('hoikuen-last-reset-v2', today);
+  // Auto-reset
+  (function(){
+    const now=new Date(),today=now.toISOString().slice(0,10);
+    const lr=localStorage.getItem('hoikuen-lr-v3');
+    if(lr!==today&&now.getHours()>=5){
+      const s=load();
+      Object.keys(s).forEach(k=>{if(k.startsWith('d-'))delete s[k]});
+      if(now.getDay()===1)Object.keys(s).forEach(k=>{if(k.startsWith('m-'))delete s[k]});
+      save(s);localStorage.setItem('hoikuen-lr-v3',today);
     }
-  }
-  checkAutoReset();
+  })();
 
-  const state = loadState();
-  const items = document.querySelectorAll('.item[data-id]');
-  items.forEach(item => {
-    const id = item.dataset.id;
-    if (state[id]) item.classList.add('checked');
-    item.addEventListener('click', () => {
-      item.classList.toggle('checked');
-      if (item.classList.contains('checked')) {
-        state[id] = true;
-        if (navigator.vibrate) navigator.vibrate(10);
-      } else { delete state[id]; }
-      saveState(state);
-      updateProgress();
+  const state=load();
+
+  // Init items
+  document.querySelectorAll('.item[data-id]').forEach(el=>{
+    const id=el.dataset.id;
+    if(state[id])el.classList.add('checked');
+
+    // Check toggle
+    el.querySelector('.check-circle').addEventListener('click',e=>{
+      e.stopPropagation();
+      toggle(el,id);
+    });
+
+    // Detail expand
+    el.addEventListener('click',e=>{
+      if(e.target.closest('.check-circle'))return;
+      const d=el.querySelector('.detail');
+      const c=el.querySelector('.chevron');
+      d.classList.toggle('open');
+      c.classList.toggle('open');
     });
   });
+
+  function toggle(el,id){
+    el.classList.toggle('checked');
+    if(el.classList.contains('checked')){
+      state[id]=true;
+      if(navigator.vibrate)navigator.vibrate(10);
+    }else{delete state[id]}
+    save(state);
+    updateAll();
+    // Move checked to bottom after small delay
+    setTimeout(()=>sortItems(el.dataset.g),150);
+  }
+
+  // Group check all
+  document.querySelectorAll('.group-check-all').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const g=btn.dataset.target;
+      const items=document.querySelectorAll('.item[data-g="'+g+'"]');
+      const allChecked=[...items].every(i=>i.classList.contains('checked'));
+      items.forEach(el=>{
+        const id=el.dataset.id;
+        if(allChecked){el.classList.remove('checked');delete state[id]}
+        else{el.classList.add('checked');state[id]=true}
+      });
+      save(state);updateAll();
+      setTimeout(()=>sortItems(g),150);
+    });
+  });
+
+  // Sort checked to bottom
+  function sortItems(g){
+    const container=document.getElementById('items-'+g);
+    if(!container)return;
+    const items=[...container.querySelectorAll('.item')];
+    items.sort((a,b)=>{
+      const ac=a.classList.contains('checked')?1:0;
+      const bc=b.classList.contains('checked')?1:0;
+      return ac-bc;
+    });
+    items.forEach(i=>container.appendChild(i));
+  }
 
   // Tabs
-  const tabs = document.querySelectorAll('.tab');
-  const contents = document.querySelectorAll('.tab-content');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      contents.forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
       tab.classList.add('active');
-      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
     });
   });
 
-  function updateProgress() {
-    ['daily', 'monday'].forEach(type => {
-      const allItems = document.querySelectorAll('#tab-' + type + ' .item[data-id]');
-      const total = allItems.length;
-      let checked = 0;
-      allItems.forEach(i => { if (i.classList.contains('checked')) checked++; });
-      const pct = total > 0 ? (checked / total * 100) : 0;
-      const bar = document.getElementById(type + '-progress');
-      bar.style.width = pct + '%';
-      bar.classList.toggle('complete', pct === 100);
-      document.getElementById(type + '-count').textContent = checked + ' / ' + total;
-      document.getElementById(type + '-complete').classList.toggle('show', pct === 100);
+  function updateAll(){
+    // Per-tab remaining
+    ['daily','monday'].forEach(tab=>{
+      const items=document.querySelectorAll('#tab-'+tab+' .item[data-id]');
+      let left=0;items.forEach(i=>{if(!i.classList.contains('checked'))left++});
+      document.getElementById(tab+'-left').textContent=left;
+      const rem=document.getElementById(tab+'-remaining');
+      const cel=document.getElementById(tab+'-celebrate');
+      if(left===0&&items.length>0){rem.classList.add('done');cel.classList.add('show')}
+      else{rem.classList.remove('done');cel.classList.remove('show')}
+    });
+
+    // Per-group badges
+    document.querySelectorAll('.group').forEach(g=>{
+      const gname=g.dataset.group;
+      const items=g.querySelectorAll('.item[data-id]');
+      let checked=0;items.forEach(i=>{if(i.classList.contains('checked'))checked++});
+      const badge=document.getElementById('badge-'+gname);
+      if(badge){
+        badge.textContent=checked+'/'+items.length;
+        badge.classList.toggle('done',checked===items.length);
+      }
     });
   }
-  updateProgress();
 
-  document.getElementById('resetBtn').addEventListener('click', () => {
-    if (!confirm('チェックをリセットしますか？')) return;
-    const activeTab = document.querySelector('.tab.active').dataset.tab;
-    const prefix = activeTab === 'daily' ? 'd-' : 'm-';
-    const currentState = loadState();
-    Object.keys(currentState).forEach(k => { if (k.startsWith(prefix)) delete currentState[k]; });
-    saveState(currentState);
-    document.querySelectorAll('#tab-' + activeTab + ' .item').forEach(i => i.classList.remove('checked'));
-    updateProgress();
+  // Initial sort & update
+  document.querySelectorAll('.group').forEach(g=>sortItems(g.dataset.group));
+  updateAll();
+
+  // Reset
+  document.getElementById('resetBtn').addEventListener('click',()=>{
+    if(!confirm('チェックをリセットしますか？'))return;
+    const tab=document.querySelector('.tab.active').dataset.tab;
+    const prefix=tab==='daily'?'d-':'m-';
+    const s=load();
+    Object.keys(s).forEach(k=>{if(k.startsWith(prefix))delete s[k]});
+    save(s);
+    Object.assign(state,load());
+    // Clear checks from deleted keys
+    Object.keys(state).forEach(k=>{if(k.startsWith(prefix))delete state[k]});
+    document.querySelectorAll('#tab-'+tab+' .item').forEach(i=>i.classList.remove('checked'));
+    document.querySelectorAll('#tab-'+tab+' .group').forEach(g=>sortItems(g.dataset.group));
+    updateAll();
   });
 })();
 </script>
-
 </body>
 </html>
